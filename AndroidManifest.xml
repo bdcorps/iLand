@@ -1,35 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.yourcompany.livewallpapertemplate"
-      android:versionCode="1"
-      android:versionName="1.00">
-      
-	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15"/>
-	
-	<uses-feature android:name="android.software.live_wallpaper" />
-    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name">
-		<!-- Live Wallpaper Service -->
-		<service 
-			android:name="com.bdcorps.ilandfree.PlanetMain"
-			android:enabled="true"
-			android:icon="@drawable/ic_launcher"
-			android:label="@string/app_name"
-			android:permission="android.permission.BIND_WALLPAPER">
-			
-			<intent-filter android:priority="1" >
-				<action android:name="android.service.wallpaper.WallpaperService" />
-			</intent-filter>
-			<meta-data 
-				android:name="android.service.wallpaper" 
-				android:resource="@xml/wallpaper" />		
-		</service>
-		
-		 <!-- Live Wallpaper Settings Activity -->
-		 <activity
-        	android:label="@string/wallpaper_settings"
-        	android:name="com.bdcorps.ilandfree.LiveWallpaperServiceSettings"
-        	android:theme="@android:style/Theme.WallpaperSettings" android:exported="true">
+    package="com.bdcorps.iland"
+    android:versionCode="2.1"
+    android:versionName="2.1" >
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="15" />
+
+    <uses-feature android:name="android.software.live_wallpaper" />
+     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <activity
+            android:name="com.bdcorps.iland.StarterActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
+        <!-- Live Wallpaper Service -->
+        <service
+            android:name="com.bdcorps.iland.PlanetMain"
+            android:enabled="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_WALLPAPER" >
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/wallpaper" />
+        </service>
+
+        <!-- Live Wallpaper Settings Activity -->
+        <activity
+            android:name="com.bdcorps.iland.LiveWallpaperServiceSettings"
+            android:exported="true"
+            android:label="@string/wallpaper_settings"
+            android:theme="@android:style/Theme.WallpaperSettings" >
+        </activity>
+        
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
     </application>
 
-</manifest> 
+</manifest>

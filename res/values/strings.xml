@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Live Wallpaper Template</string>
-    <string name="wallpaper_description">Also please download: Endless Universe Live Wallpaper</string>
+    <string name="app_name">iLand</string>
+    <string name="wallpaper_description">A visually pleasing Live Wallpaper thats changes colour according to the time of the day</string>
 
     <!-- Settings -->
     <string name="wallpaper_settings">Settings</string>
     
     <!-- Touch Input Setting -->
-    <string name="androidColorTitle">Android Color</string>
-	<string name="androidColorDescription">Change the color of the Android</string>
-    
-    <string name="creditTitle">Thank Yous and Whatnots</string>
+   
+    <string name="creditTitle">Thank You</string>
 	<string name="thanksTitle">Thanks!</string>
-	<string name="thanksDescription">Big thanks to AndEngine for making this possible</string>
+	<string name="thanksDescription">Thank You for installing!</string>
 </resources>
+
+

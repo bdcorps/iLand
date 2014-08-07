@@ -22,7 +22,7 @@ public class EaseBackInCustom implements IEaseFunction {
 	}
 
 	public static EaseBackInCustom getInstance() {
-		if(null == INSTANCE) {
+		if (null == INSTANCE) {
 			INSTANCE = new EaseBackInCustom();
 		}
 		return INSTANCE;
@@ -37,7 +37,8 @@ public class EaseBackInCustom implements IEaseFunction {
 	// ===========================================================
 
 	@Override
-	public float getPercentage(final float pSecondsElapsed, final float pDuration) {
+	public float getPercentage(final float pSecondsElapsed,
+			final float pDuration) {
 		return EaseBackInCustom.getValue(pSecondsElapsed / pDuration);
 	}
 
@@ -46,7 +47,8 @@ public class EaseBackInCustom implements IEaseFunction {
 	// ===========================================================
 
 	public static float getValue(final float pPercentage) {
-		return pPercentage * pPercentage * ((OVERSHOOT_CONSTANT + 1) * pPercentage - OVERSHOOT_CONSTANT);
+		return pPercentage * pPercentage
+				* ((OVERSHOOT_CONSTANT + 1) * pPercentage - OVERSHOOT_CONSTANT);
 	}
 
 	// ===========================================================

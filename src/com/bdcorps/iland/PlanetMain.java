@@ -1,4 +1,4 @@
-package com.bdcorps.ilandfree;
+package com.bdcorps.iland;
 
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
@@ -23,7 +23,6 @@ import org.andengine.entity.particle.modifier.AlphaParticleModifier;
 import org.andengine.entity.particle.modifier.ExpireParticleInitializer;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.RepeatingSpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.ui.livewallpaper.BaseLiveWallpaperService;
@@ -31,15 +30,20 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.andengine.opengl.texture.atlas.bitmap.source.AssetBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.view.ConfigChooser;
 import org.andengine.opengl.view.EngineRenderer;
 import org.andengine.opengl.view.IRendererListener;
 import org.andengine.util.modifier.ease.EaseBackInCustom;
 
+import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather;
+import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
+import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import android.app.WallpaperManager;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.opengl.GLES20;
 import android.os.Bundle;
 import android.text.format.Time;
@@ -48,10 +52,12 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class PlanetMain extends BaseLiveWallpaperService implements
-		SharedPreferences.OnSharedPreferenceChangeListener, IOffsetsChanged,
-		IOnSceneTouchListener {
+		OnSharedPreferenceChangeListener, IOffsetsChanged,
+		IOnSceneTouchListener ,YahooWeatherInfoListener,
+	    YahooWeatherExceptionListener{
 	// ===========================================================
 	// Master TO-DOs
 	// ===========================================================
@@ -62,7 +68,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 800;
 	public static final String SHARED_PREFS_NAME = "livewallpaperservicesettings";
-	
+
 	private SharedPreferences mSharedPreferences;
 
 	Display display;
@@ -128,7 +134,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	BitmapTextureAtlas snowTexture;
 	ITextureRegion snowRegion;
 	LoopEntityModifier snowModifier;
-	
+
 	Sprite lf;
 	BitmapTextureAtlas lfTexture;
 	ITextureRegion lfRegion;
@@ -139,6 +145,11 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 	Time time;
 	String assetSuffix = "noon";
+	BatchedPseudoSpriteParticleSystem leafSystem;
+	BatchedPseudoSpriteParticleSystem rainSystem;
+	BatchedPseudoSpriteParticleSystem snowSystem;
+	
+	private YahooWeather mYahooWeather = YahooWeather.getInstance(5000, 5000, true);
 
 	// ===========================================================
 	// Constructors
@@ -154,7 +165,6 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences pSharedPrefs,
 			String pKey) {
-		androidAssetPath = pSharedPrefs.getString("colorPref", "android.png");
 		if (assetsCreated) {
 			resetAndroidAsset();
 		}
@@ -165,8 +175,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 			float yOffsetStep, int xPixelOffset, int yPixelOffset) {
 
 		if (mEngine.getCamera() != null) {
-		// mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
-		 }
+			// mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
+		}
 
 	}
 
@@ -240,22 +250,24 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 		initializePreferences();
 		// scene.setScale(0.5f);
-					
+
 		// BG
-		
 		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1300,
 				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
-				bgTexture, this, "bg_"
-						+ assetSuffix + ".png", 0, 0);
+				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
 		bg = new Sprite(0, 0, bgRegion, this.getVertexBufferObjectManager());
 		bgTexture.load();
 		scene.attachChild(bg);
-/*
-		scene.setBackgroundEnabled(true);
-
-		RepeatingSpriteBackground mGrassBackground = new RepeatingSpriteBackground(1024, 1024, this.getTextureManager(), AssetBitmapTextureAtlasSource.create(this.getAssets(), "gfx/background_grass.png"), this.getVertexBufferObjectManager());
-scene.setBackground(mGrassBackground);*/
+		/*
+		 * scene.setBackgroundEnabled(true);
+		 * 
+		 * RepeatingSpriteBackground mGrassBackground = new
+		 * RepeatingSpriteBackground(1024, 1024, this.getTextureManager(),
+		 * AssetBitmapTextureAtlasSource.create(this.getAssets(),
+		 * "gfx/background_grass.png"), this.getVertexBufferObjectManager());
+		 * scene.setBackground(mGrassBackground);
+		 */
 
 		// Scene 1
 		scene_1Texture = new BitmapTextureAtlas(this.getTextureManager(), 700,
@@ -377,7 +389,7 @@ scene.setBackground(mGrassBackground);*/
 				rdTexture, this, "raindrop.png", 0, 0);
 		rdTexture.load();
 
-		final BatchedPseudoSpriteParticleSystem rainSystem = new BatchedPseudoSpriteParticleSystem(
+rainSystem = new BatchedPseudoSpriteParticleSystem(
 				new RectangleParticleEmitter(0f, 0f, CAMERA_HEIGHT,
 						CAMERA_HEIGHT / 2), 1, 3, 100, rdRegion,
 				this.getVertexBufferObjectManager());
@@ -386,7 +398,7 @@ scene.setBackground(mGrassBackground);*/
 		// ColorParticleInitializer<Entity>(1, 1, 1));
 		rainSystem
 				.addParticleInitializer(new VelocityParticleInitializer<Entity>(
-						45, 50, 90, 100));
+						90,100, 120, 135));
 		// rainSystem.addParticleInitializer(new
 		// AccelerationParticleInitializer<Entity>(5, 15, 5, 30));
 		rainSystem
@@ -407,7 +419,7 @@ scene.setBackground(mGrassBackground);*/
 				snowTexture, this, "snow.png", 0, 0);
 		snowTexture.load();
 
-		final BatchedPseudoSpriteParticleSystem snowSystem = new BatchedPseudoSpriteParticleSystem(
+snowSystem = new BatchedPseudoSpriteParticleSystem(
 				new RectangleParticleEmitter(0f, 0f, CAMERA_HEIGHT,
 						CAMERA_HEIGHT / 2), 2, 5, 100, snowRegion,
 				this.getVertexBufferObjectManager());
@@ -434,23 +446,26 @@ scene.setBackground(mGrassBackground);*/
 				10f, 1.0f, 0.0f));
 		// scene.attachChild(snowSystem);
 
-		
 		lfTexture = new BitmapTextureAtlas(this.getTextureManager(), 50, 34,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		lfRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
 				lfTexture, this, "leaf.png", 0, 0);
 		lfTexture.load();
 
-		final BatchedPseudoSpriteParticleSystem leafSystem = new BatchedPseudoSpriteParticleSystem(
+		leafSystem = new BatchedPseudoSpriteParticleSystem(
 				new RectangleParticleEmitter(0f, 0f, CAMERA_HEIGHT,
-						CAMERA_HEIGHT / 2), 2, 3, 100, lfRegion,
+						CAMERA_HEIGHT / 2), 1, 2, 70, lfRegion,
 				this.getVertexBufferObjectManager());
 		leafSystem.setBlendFunction(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE);
 		leafSystem.addParticleInitializer(new ColorParticleInitializer<Entity>(
 				1, 1, 1));
+		/*
+		 * leafSystem .addParticleInitializer(new
+		 * VelocityParticleInitializer<Entity>( -9, 0, -8, 5));
+		 */
 		leafSystem
 				.addParticleInitializer(new VelocityParticleInitializer<Entity>(
-						-9, 0, -8, 5));
+						-9, 0, -18, -9));
 		leafSystem
 				.addParticleInitializer(new AccelerationParticleInitializer<Entity>(
 						20, 45, 20, 50));
@@ -466,8 +481,8 @@ scene.setBackground(mGrassBackground);*/
 
 		leafSystem.addParticleModifier(new AlphaParticleModifier<Entity>(6f,
 				10f, 1.0f, 0.75f));
-	scene.attachChild(leafSystem);
-		
+		scene.attachChild(leafSystem);
+
 		float planet_1Center[] = getCenter(planet_1.getWidth(),
 				planet_1.getHeight());
 		float planet_2Center[] = getCenter(planet_2.getWidth(),
@@ -494,15 +509,13 @@ scene.setBackground(mGrassBackground);*/
 
 		loadOrientation();
 
+        mYahooWeather.setExceptionListener(this);
 		pOnCreateResourcesCallback.onCreateResourcesFinished();
 
 	}
 
 	protected void update() {
-		// TODO Auto-generated method stub
-
 		time.setToNow();
-		
 		String tempSuffix = assetSuffix;
 		if (time.hour >= 4 && time.hour <= 10) {
 			// dawn
@@ -519,8 +532,20 @@ scene.setBackground(mGrassBackground);*/
 			assetSuffix = "night";
 		}
 		if (!assetSuffix.equals(tempSuffix)) {
-			Log.d("StripedLog", "TIME CHANGED BITCHES: "+assetSuffix);
+			Log.d("StripedLog", "TIME CHANGED BITCHES: " + assetSuffix);
 			resetAndroidAsset();
+			if (leafSystem != null) {
+				if (assetSuffix.equals("noon")) {
+					scene.attachChild(leafSystem);
+				} else {
+					scene.detachChild(leafSystem);
+				}
+			}
+			if (sunModifier != null) {
+				if (assetSuffix.equals("night")) {
+					sun.unregisterEntityModifier(sunModifier);
+				}
+			}
 		}
 	}
 
@@ -533,27 +558,27 @@ scene.setBackground(mGrassBackground);*/
 	}
 
 	public void resetAndroidAsset() {
-		if (assetsCreated) {			/*
-			move(scene_3, "down", 10);
-			scene_3.registerEntityModifier(planet_move);
-			move(planet_3, "down", 10);
-			planet_3.registerEntityModifier(planet_move);
-
-			move(scene_2, "down", 5);
-			scene_2.registerEntityModifier(planet_move);
-			move(planet_2, "down", 5);
-			planet_2.registerEntityModifier(planet_move);
-
-			move(scene_1, "down", 5);
-			scene_1.registerEntityModifier(planet_move);
-			move(planet_1, "down", 5);
-			planet_1.registerEntityModifier(planet_move);*/
+		if (assetsCreated) { /*
+							 * move(scene_3, "down", 10);
+							 * scene_3.registerEntityModifier(planet_move);
+							 * move(planet_3, "down", 10);
+							 * planet_3.registerEntityModifier(planet_move);
+							 * 
+							 * move(scene_2, "down", 5);
+							 * scene_2.registerEntityModifier(planet_move);
+							 * move(planet_2, "down", 5);
+							 * planet_2.registerEntityModifier(planet_move);
+							 * 
+							 * move(scene_1, "down", 5);
+							 * scene_1.registerEntityModifier(planet_move);
+							 * move(planet_1, "down", 5);
+							 * planet_1.registerEntityModifier(planet_move);
+							 */
 
 			bgTexture.clearTextureAtlasSources();
-			bgRegion = BitmapTextureAtlasTextureRegionFactory
-					.createFromAsset(bgTexture, this, "bg_"
-							+ assetSuffix + ".png", 0, 0);
-			
+			bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
+					bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
+
 			planet_1Texture.clearTextureAtlasSources();
 			planet_1Region = BitmapTextureAtlasTextureRegionFactory
 					.createFromAsset(planet_1Texture, this, "planet_1_"
@@ -585,9 +610,8 @@ scene.setBackground(mGrassBackground);*/
 							+ assetSuffix + ".png", 0, 0);
 
 			sunTexture.clearTextureAtlasSources();
-			sunRegion = BitmapTextureAtlasTextureRegionFactory
-					.createFromAsset(sunTexture, this, "sun_"
-							+ assetSuffix + ".png", 0, 0);
+			sunRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
+					sunTexture, this, "sun_" + assetSuffix + ".png", 0, 0);
 
 			/*
 			 * 
@@ -632,8 +656,8 @@ scene.setBackground(mGrassBackground);*/
 							EaseBackInCustom.getInstance()) {
 						@Override
 						protected void onModifierFinished(IEntity pItem) {
-						//	spr.unregisterEntityModifier(planet_move);
-							//planet_move.reset();
+							// spr.unregisterEntityModifier(planet_move);
+							// planet_move.reset();
 							super.onModifierFinished(pItem);
 						}
 					});
@@ -657,14 +681,14 @@ scene.setBackground(mGrassBackground);*/
 	@Override
 	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback)
 			throws Exception {
-		move(scene_3, "up", 10);
+		move(scene_3, "up", 6);
 		scene_3.registerEntityModifier(planet_move);
-		move(planet_3, "up", 10);
+		move(planet_3, "up", 6);
 		planet_3.registerEntityModifier(planet_move);
 
-		move(scene_2, "up", 5);
+		move(scene_2, "up", 3);
 		scene_2.registerEntityModifier(planet_move);
-		move(planet_2, "up", 5);
+		move(planet_2, "up", 3);
 		planet_2.registerEntityModifier(planet_move);
 
 		move(scene_1, "up", 0);
@@ -781,7 +805,6 @@ scene.setBackground(mGrassBackground);*/
 				int yPixelOffset) {
 		}
 
-
 		@Override
 		public void onTouchEvent(MotionEvent event) {
 			super.onTouchEvent(event);
@@ -791,6 +814,9 @@ scene.setBackground(mGrassBackground);*/
 
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
+
+		        searchByGPS();
+		        
 				if (event.getY() < 0) {
 					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
 				} else if (event.getY() > CAMERA_HEIGHT / 2) {
@@ -800,7 +826,6 @@ scene.setBackground(mGrassBackground);*/
 					sun.setPosition(event.getX() - sun.getWidth() / 2,
 							event.getY() - sun.getHeight() / 2);
 				}
-				
 
 				return;
 			case MotionEvent.ACTION_MOVE:
@@ -820,5 +845,49 @@ scene.setBackground(mGrassBackground);*/
 				return;
 			}
 		}
+	}
+
+	@Override
+	public void onFailConnection(Exception e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFailParsing(Exception e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFailFindLocation(Exception e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gotWeatherInfo(WeatherInfo weatherInfo) {
+		   if (weatherInfo != null) {
+
+   			if (leafSystem != null){scene.detachChild(leafSystem);}
+			   
+				if ((weatherInfo.getCurrentCode()>0&&weatherInfo.getCurrentCode()<=12)||(weatherInfo.getCurrentCode()==46))   {
+					  //rain
+					scene.attachChild(rainSystem);
+		        Log.d("StripedLog", 
+		        		String.valueOf(weatherInfo.getCurrentCode()));
+		        	}else if ((weatherInfo.getCurrentCode()>=15&&weatherInfo.getCurrentCode()<=18)||(weatherInfo.getCurrentCode()>=41&&weatherInfo.getCurrentCode()<=43)){//snow
+
+						scene.attachChild(snowSystem);	}else 
+		        		{
+		        			if (leafSystem != null){scene.detachChild(leafSystem);}
+		        			if (rainSystem != null){scene.detachChild(rainSystem);}
+		        			if (snowSystem != null){scene.detachChild(snowSystem);}}
+		   }
+	}
+	
+	private void searchByGPS() {
+		mYahooWeather.setSearchMode(SEARCH_MODE.GPS);
+		mYahooWeather.queryYahooWeatherByGPS(getApplicationContext(), this);
 	}
 }
