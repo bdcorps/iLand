@@ -24,7 +24,7 @@ public class LiveWallpaperServiceSettings extends PreferenceActivity implements
 
 		// Admob Interstitial
 		interstitial = new InterstitialAd(this);
-		  interstitial.setAdUnitId("ca-app-pub-2914505663533005/7056850773 ");
+		  interstitial.setAdUnitId("ca-app-pub-2914505663533005/7056850773");
 
 			AdRequest adRequest = new AdRequest.Builder()
 			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
