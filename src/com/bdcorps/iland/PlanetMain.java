@@ -1,5 +1,7 @@
 package com.bdcorps.iland;
 
+import java.util.logging.LogRecord;
+
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.options.EngineOptions;
@@ -46,6 +48,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.opengl.GLES20;
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Display;
@@ -149,7 +152,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	BatchedPseudoSpriteParticleSystem rainSystem;
 	BatchedPseudoSpriteParticleSystem snowSystem;
 	
-	private YahooWeather mYahooWeather = YahooWeather.getInstance(5000, 5000, true);
+	private YahooWeather mYahooWeather = YahooWeather.getInstance(1000, 1000, true);
 
 	// ===========================================================
 	// Constructors
@@ -251,6 +254,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		initializePreferences();
 		// scene.setScale(0.5f);
 
+
+        
 		// BG
 		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1300,
 				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -508,8 +513,10 @@ snowSystem = new BatchedPseudoSpriteParticleSystem(
 		assetsCreated = true;
 
 		loadOrientation();
-
+Looper.prepare();
         mYahooWeather.setExceptionListener(this);
+
+        searchByGPS();
 		pOnCreateResourcesCallback.onCreateResourcesFinished();
 
 	}
@@ -814,8 +821,6 @@ snowSystem = new BatchedPseudoSpriteParticleSystem(
 
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
-
-		        searchByGPS();
 		        
 				if (event.getY() < 0) {
 					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
@@ -861,28 +866,28 @@ snowSystem = new BatchedPseudoSpriteParticleSystem(
 
 	@Override
 	public void onFailFindLocation(Exception e) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
-
+	
 	@Override
 	public void gotWeatherInfo(WeatherInfo weatherInfo) {
 		   if (weatherInfo != null) {
-
-   			if (leafSystem != null){scene.detachChild(leafSystem);}
+   			//if (leafSystem != null)
+   			{scene.detachChild(leafSystem);}
 			   
-				if ((weatherInfo.getCurrentCode()>0&&weatherInfo.getCurrentCode()<=12)||(weatherInfo.getCurrentCode()==46))   {
+			if ((weatherInfo.getCurrentCode()>0&&weatherInfo.getCurrentCode()<=12)||(weatherInfo.getCurrentCode()==46))   {
 					  //rain
-					scene.attachChild(rainSystem);
+   			scene.attachChild(rainSystem);
+				/*
 		        Log.d("StripedLog", 
 		        		String.valueOf(weatherInfo.getCurrentCode()));
-		        	}else if ((weatherInfo.getCurrentCode()>=15&&weatherInfo.getCurrentCode()<=18)||(weatherInfo.getCurrentCode()>=41&&weatherInfo.getCurrentCode()<=43)){//snow
+		        	*/}else if ((weatherInfo.getCurrentCode()>=15&&weatherInfo.getCurrentCode()<=18)||(weatherInfo.getCurrentCode()>=41&&weatherInfo.getCurrentCode()<=43)){//snow
 
 						scene.attachChild(snowSystem);	}else 
 		        		{
-		        			if (leafSystem != null){scene.detachChild(leafSystem);}
-		        			if (rainSystem != null){scene.detachChild(rainSystem);}
-		        			if (snowSystem != null){scene.detachChild(snowSystem);}}
+		        		{scene.detachChild(leafSystem);}
+		        			{scene.detachChild(rainSystem);}
+		        			{scene.detachChild(snowSystem);}}
 		   }
 	}
 	
