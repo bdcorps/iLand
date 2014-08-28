@@ -178,7 +178,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 			float yOffsetStep, int xPixelOffset, int yPixelOffset) {
 
 		if (mEngine.getCamera() != null) {
-			// mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
+			mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
 		}
 
 	}
@@ -809,7 +809,9 @@ Looper.prepare();
 		@Override
 		public void onOffsetsChanged(float xOffset, float yOffset,
 				float xOffsetStep, float yOffsetStep, int xPixelOffset,
-				int yPixelOffset) {
+				int yPixelOffset) {	if (mEngine.getCamera() != null) {
+				//	mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
+				}
 		}
 
 		@Override
@@ -820,8 +822,7 @@ Looper.prepare();
 			final float touchY = event.getY();
 
 			switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-		        
+			case MotionEvent.ACTION_DOWN:/*
 				if (event.getY() < 0) {
 					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
 				} else if (event.getY() > CAMERA_HEIGHT / 2) {
@@ -832,9 +833,9 @@ Looper.prepare();
 							event.getY() - sun.getHeight() / 2);
 				}
 
-				return;
+				return;*/
 			case MotionEvent.ACTION_MOVE:
-				if (event.getY() < 0) {
+				/*if (event.getY() < 0) {
 					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
 				} else if (event.getY() > CAMERA_HEIGHT / 2) {
 					sun.setPosition(event.getX() - sun.getWidth() / 2,
@@ -842,7 +843,7 @@ Looper.prepare();
 				} else {
 					sun.setPosition(event.getX() - sun.getWidth() / 2,
 							event.getY() - sun.getHeight() / 2);
-				}
+				}*/
 
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
