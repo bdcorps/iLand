@@ -52,9 +52,11 @@ import android.os.Looper;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.WindowManager;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.widget.Toast;
 
 public class PlanetMain extends BaseLiveWallpaperService implements
@@ -176,23 +178,27 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	@Override
 	public void offsetsChanged(float xOffset, float yOffset, float xOffsetStep,
 			float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-
+/*
 		if (mEngine.getCamera() != null) {
 			mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
 		}
-
+*/
 	}
 
 	// ===========================================================
 	// Methods
 	// ===========================================================
 
+	float w,h;
 	public void loadOrientation() {
 		display = ((WindowManager) getSystemService(WINDOW_SERVICE))
 				.getDefaultDisplay();
-	}
+				    w = display.getWidth();
+		    h = display.getHeight();
+			}
 
 	public void checkOrientation() {
+		/*
 		rotation = display.getOrientation();
 		if (oldRotation != rotation) {
 			oldRotation = rotation;
@@ -201,14 +207,14 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				mEngine.getCamera().setCenter(CAMERA_WIDTH / 2, 540);
 				scene.setScaleX(.5f);
 				scene.setScaleY(1.4f);
-			} else {
+			} else*/ {
 				if (mEngine.getCamera().getCenterY() != CAMERA_HEIGHT / 2) {
-					mEngine.getCamera().setCenter(((CAMERA_WIDTH)),
+					mEngine.getCamera().setCenter(((CAMERA_WIDTH)/2),
 							CAMERA_HEIGHT);
 				}
 				scene.setScale(1);
 			}
-		}
+		
 
 	}
 
@@ -227,16 +233,19 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	public EngineOptions onCreateEngineOptions() {
 		zoomCamera = new ZoomCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true,
-				ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(
+				ScreenOrientation.PORTRAIT_FIXED, new RatioResolutionPolicy(
 						CAMERA_WIDTH, CAMERA_HEIGHT), zoomCamera);
 		engineOptions.getRenderOptions().setDithering(true);
 		return engineOptions;
+		
 	}
+	  private GestureDetector gestureDetector;
 
 	@Override
 	public void onCreateResources(
 			OnCreateResourcesCallback pOnCreateResourcesCallback)
 			throws Exception {
+	    
 		scene = new Scene();
 		time = new Time();
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
@@ -257,7 +266,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
         
 		// BG
-		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1300,
+		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1536,
 				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
@@ -373,7 +382,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 		sunModifier = new LoopEntityModifier(new RotationModifier(150, 0, 360));
 		sun.registerEntityModifier(sunModifier);
-
+/*
 		// Cloud
 		cloudTexture = new BitmapTextureAtlas(this.getTextureManager(), 2100,
 				2100, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -386,7 +395,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 		cloudModifier = new LoopEntityModifier(
 				new RotationModifier(200, 0, 360));
-		cloud.registerEntityModifier(cloudModifier);
+		cloud.registerEntityModifier(cloudModifier);*/
 
 		rdTexture = new BitmapTextureAtlas(this.getTextureManager(), 20, 20,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -516,6 +525,9 @@ snowSystem = new BatchedPseudoSpriteParticleSystem(
 Looper.prepare();
         mYahooWeather.setExceptionListener(this);
 
+
+	    gestureDetector = new GestureDetector(
+	                      new SwipeGestureDetector());
         searchByGPS();
 		pOnCreateResourcesCallback.onCreateResourcesFinished();
 
@@ -554,6 +566,7 @@ Looper.prepare();
 				}
 			}
 		}
+		
 	}
 
 	int a = 0;
@@ -634,6 +647,8 @@ Looper.prepare();
 			 * scene_1.registerEntityModifier(planet_move); move(planet_1, "up",
 			 * 5); planet_1.registerEntityModifier(planet_move);
 			 */
+			
+			
 		}
 	}
 
@@ -792,6 +807,7 @@ Looper.prepare();
 		public void onResume() {
 			super.onResume();
 			PlanetMain.this.onResume();
+			
 		}
 
 		@Override
@@ -810,10 +826,11 @@ Looper.prepare();
 		public void onOffsetsChanged(float xOffset, float yOffset,
 				float xOffsetStep, float yOffsetStep, int xPixelOffset,
 				int yPixelOffset) {	if (mEngine.getCamera() != null) {
-				//	mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
-				}
+			//	mEngine.getCamera().setCenter((360)-((120 * xOffset) + 60),  mEngine.getCamera().getCenterY());
+				mEngine.getCamera().setCenter((w-w/4)-(((w/4) * xOffset)),  mEngine.getCamera().getCenterY());
+							}
 		}
-
+/*
 		@Override
 		public void onTouchEvent(MotionEvent event) {
 			super.onTouchEvent(event);
@@ -821,36 +838,29 @@ Looper.prepare();
 			final float touchX = event.getX();
 			final float touchY = event.getY();
 
+			 if (gestureDetector.onTouchEvent(event)) {
+			    
+			    }
+			 
 			switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:/*
-				if (event.getY() < 0) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
-				} else if (event.getY() > CAMERA_HEIGHT / 2) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							CAMERA_HEIGHT / 2);
-				} else {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							event.getY() - sun.getHeight() / 2);
-				}
-
-				return;*/
+			case MotionEvent.ACTION_DOWN:
+				
 			case MotionEvent.ACTION_MOVE:
-				/*if (event.getY() < 0) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
-				} else if (event.getY() > CAMERA_HEIGHT / 2) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							CAMERA_HEIGHT / 2);
-				} else {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							event.getY() - sun.getHeight() / 2);
-				}*/
+				
 
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 			default:
 				return;
 			}
-		}
+		}*/
+		
+		@Override
+		  public void onTouchEvent(MotionEvent event) {
+		    if (gestureDetector.onTouchEvent(event)) {
+		      return;
+		    }
+		  }
 	}
 
 	@Override
@@ -896,4 +906,51 @@ Looper.prepare();
 		mYahooWeather.setSearchMode(SEARCH_MODE.GPS);
 		mYahooWeather.queryYahooWeatherByGPS(getApplicationContext(), this);
 	}
+	
+	
+	  // Private class for gestures
+	  private class SwipeGestureDetector 
+	          extends SimpleOnGestureListener {
+	    // Swipe properties, you can change it to make the swipe 
+	    // longer or shorter and speed
+	    private static final int SWIPE_MIN_DISTANCE = 120;
+	    private static final int SWIPE_MAX_OFF_PATH = 200;
+	    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+
+	    @Override
+	    public boolean onFling(MotionEvent e1, MotionEvent e2,
+	                         float velocityX, float velocityY) {
+	      try {
+	        float diffAbs = Math.abs(e1.getY() - e2.getY());
+	        float diff = e1.getX() - e2.getX();
+
+	        if (diffAbs > SWIPE_MAX_OFF_PATH)
+	          return false;
+	        
+	        // Left swipe
+	        if (diff > SWIPE_MIN_DISTANCE
+	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+	          onLeftSwipe();
+
+	        // Right swipe
+	        } else if (-diff > SWIPE_MIN_DISTANCE
+	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+	        	onRightSwipe();
+	        }
+	      } catch (Exception e) {
+	        Log.e("YourActivity", "Error on gestures");
+	      }
+	      return false;
+	    }
+	  }
+
+	public void onLeftSwipe() {
+	//	mEngine.getCamera().setCenter((w-w/4)-(((w/4) * 0.5f) + (w-w/4)/6),  mEngine.getCamera().getCenterY());
+		//mEngine.getCamera().setCenter(((480 * 0.5f)),  mEngine.getCamera().getCenterY());
+			
+		Log.d("StripedLog", "left");	
+	}
+
+	public static void onRightSwipe() {
+		Log.d("StripedLog", "right");		}
 }
