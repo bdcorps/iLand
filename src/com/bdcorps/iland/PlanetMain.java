@@ -46,6 +46,7 @@ import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Configuration;
 import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Looper;
@@ -155,6 +156,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	BatchedPseudoSpriteParticleSystem snowSystem;
 	
 	private YahooWeather mYahooWeather = YahooWeather.getInstance(1000, 1000, true);
+	
+	boolean touchEnabled, scrollEnabled=false;
 
 	// ===========================================================
 	// Constructors
@@ -173,6 +176,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		if (assetsCreated) {
 			resetAndroidAsset();
 		}
+		touchEnabled = mSharedPreferences.getBoolean("touchKey", true);
+		scrollEnabled = mSharedPreferences.getBoolean("scrollKey", true);
 	}
 
 	@Override
@@ -195,7 +200,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				.getDefaultDisplay();
 				    w = display.getWidth();
 		    h = display.getHeight();
-			}
+	}
 
 	public void checkOrientation() {
 		/*
@@ -270,7 +275,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
-		bg = new Sprite(0, 0, bgRegion, this.getVertexBufferObjectManager());
+		bg = new Sprite(-1536/2, 0, bgRegion, this.getVertexBufferObjectManager());
 		bgTexture.load();
 		scene.attachChild(bg);
 		/*
@@ -647,8 +652,6 @@ Looper.prepare();
 			 * scene_1.registerEntityModifier(planet_move); move(planet_1, "up",
 			 * 5); planet_1.registerEntityModifier(planet_move);
 			 */
-			
-			
 		}
 	}
 
@@ -807,7 +810,6 @@ Looper.prepare();
 		public void onResume() {
 			super.onResume();
 			PlanetMain.this.onResume();
-			
 		}
 
 		@Override
@@ -827,7 +829,7 @@ Looper.prepare();
 				float xOffsetStep, float yOffsetStep, int xPixelOffset,
 				int yPixelOffset) {	if (mEngine.getCamera() != null) {
 			//	mEngine.getCamera().setCenter((360)-((120 * xOffset) + 60),  mEngine.getCamera().getCenterY());
-				mEngine.getCamera().setCenter((w-w/4)-(((w/4) * xOffset)),  mEngine.getCamera().getCenterY());
+			//	mEngine.getCamera().setCenter((w-w/4)-(((w/4) * xOffset)),  mEngine.getCamera().getCenterY());
 							}
 		}
 /*
@@ -856,11 +858,44 @@ Looper.prepare();
 		}*/
 		
 		@Override
-		  public void onTouchEvent(MotionEvent event) {
-		    if (gestureDetector.onTouchEvent(event)) {
-		      return;
-		    }
-		  }
+		public void onTouchEvent(MotionEvent event) {
+			super.onTouchEvent(event);
+
+			final float touchX = event.getX();
+			final float touchY = event.getY();
+			 if (gestureDetector.onTouchEvent(event)) {
+				   
+			    }
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				if (touchEnabled){	if (event.getY() < 0) {
+					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
+				} else if (event.getY() > CAMERA_HEIGHT / 2) {
+					sun.setPosition(event.getX() - sun.getWidth() / 2,
+							CAMERA_HEIGHT / 2);
+				} else {
+					sun.setPosition(event.getX() - sun.getWidth() / 2,
+							event.getY() - sun.getHeight() / 2);
+				}
+				}
+				return;
+			case MotionEvent.ACTION_MOVE:
+if (touchEnabled){
+				if (event.getY() < 0) {
+					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
+				} else if (event.getY() > CAMERA_HEIGHT / 2) {
+					sun.setPosition(event.getX() - sun.getWidth() / 2,
+							CAMERA_HEIGHT / 2);
+				} else {
+					sun.setPosition(event.getX() - sun.getWidth() / 2,
+							event.getY() - sun.getHeight() / 2);
+				}}
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_CANCEL:
+			default:
+				return;
+			}
+		}
 	}
 
 	@Override
@@ -944,13 +979,20 @@ Looper.prepare();
 	    }
 	  }
 
+	  @Override 
+	  public void onConfigurationChanged (Configuration newConfig){ 
+	        Log.d("StripedLog", "Error on gestures");
+	  }
+	  
 	public void onLeftSwipe() {
 	//	mEngine.getCamera().setCenter((w-w/4)-(((w/4) * 0.5f) + (w-w/4)/6),  mEngine.getCamera().getCenterY());
 		//mEngine.getCamera().setCenter(((480 * 0.5f)),  mEngine.getCamera().getCenterY());
-			
-		Log.d("StripedLog", "left");	
+		if (scrollEnabled){
+		if (mEngine.getCamera().getCenterX()>((w/2)-2*(w/6))){
+	mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()-(w/6),  mEngine.getCamera().getCenterY());}}
 	}
 
-	public static void onRightSwipe() {
-		Log.d("StripedLog", "right");		}
-}
+	public void onRightSwipe() {
+		if (scrollEnabled){if (mEngine.getCamera().getCenterX()<((w/2)+2*(w/6))){
+		mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()+(w/6),  mEngine.getCamera().getCenterY());	}
+}}}

@@ -1,20 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-<PreferenceScreen
-		xmlns:android="http://schemas.android.com/apk/res/android"
-        android:title="@string/wallpaper_settings"
-        android:key="wallpaper_settings">
-        
-     <CheckBoxPreference
-          android:title="Interactive"
-          android:defaultValue="true"
-          android:summary="Response to touch"
-          android:key="interactiveKey" />
-     
-		<PreferenceCategory
-        	android:title="@string/creditTitle">
-		<Preference
-                android:title="@string/thanksTitle"
-                android:summary="@string/thanksDescription"
-                android:key="thanksPref"/></PreferenceCategory>
+    <PreferenceCategory
+        android:key="firKey"
+        android:title="Interactive" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="touchKey"
+            android:summary="Move sun/moon with touch controls"
+            android:title="Touch Enabled" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="scrollKey"
+            android:summary="Scroll the screen when swiped left/right"
+            android:title="Scroll Enabled" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="twoKey"
+        android:title="Promotional Content" >
+        <PreferenceScreen android:title="Visit Us on Facebook" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://www.facebook.com/BurningDesireCorporations" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="Visit Us on Twitter" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://www.twitter.com/BurningDesireCorporations" />
+        </PreferenceScreen>
+        />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/creditTitle" >
+        <Preference
+            android:key="thanksPref"
+            android:summary="@string/thanksDescription"
+            android:title="@string/thanksTitle" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
