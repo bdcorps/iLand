@@ -967,12 +967,12 @@ if (touchEnabled){
 	        // Left swipe
 	        if (diff > SWIPE_MIN_DISTANCE
 	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	          onLeftSwipe();
+	       //   onLeftSwipe();
 
 	        // Right swipe
 	        } else if (-diff > SWIPE_MIN_DISTANCE
 	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	        	onRightSwipe();
+	       // 	onRightSwipe();
 	        }
 	      } catch (Exception e) {
 	        Log.e("YourActivity", "Error on gestures");
@@ -982,7 +982,7 @@ if (touchEnabled){
 	  }
 boolean tempScrollEnabled,oChanged;
 	  @Override 
-	  public void onConfigurationChanged (Configuration newConfig){ 
+	  public void onConfigurationChanged (Configuration newConfig){ /*
 		  if ((zoomCamera!=null)&&(scene!=null)){
 		  if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
           {
@@ -1004,9 +1004,9 @@ boolean tempScrollEnabled,oChanged;
                   SharedPreferences.Editor geted = mSharedPreferences.edit();
                   geted.putBoolean("scrollKey", false);
                   geted.commit();
-          }}
+          }}*/
 	  }
-	  
+	  /*
 	public void onLeftSwipe() {
 	//	mEngine.getCamera().setCenter((w-w/4)-(((w/4) * 0.5f) + (w-w/4)/6),  mEngine.getCamera().getCenterY());
 		//mEngine.getCamera().setCenter(((480 * 0.5f)),  mEngine.getCamera().getCenterY());
@@ -1018,4 +1018,4 @@ boolean tempScrollEnabled,oChanged;
 	public void onRightSwipe() {
 		if (scrollEnabled){if (mEngine.getCamera().getCenterX()<((w/2)+2*(w/6))){
 		mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()+(w/6),  mEngine.getCamera().getCenterY());	}
-}}}
+}}*/}
