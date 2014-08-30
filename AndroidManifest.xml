@@ -22,8 +22,6 @@
         <activity
             android:name="com.bdcorps.iland.StarterActivity"
             android:label="@string/app_name"
-            android:screenOrientation="nosensor"
-android:configChanges="keyboard|orientation"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

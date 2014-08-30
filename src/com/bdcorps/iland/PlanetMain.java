@@ -2,10 +2,12 @@ package com.bdcorps.iland;
 
 import java.util.logging.LogRecord;
 
+import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
+import org.andengine.engine.options.resolutionpolicy.FixedResolutionPolicy;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
@@ -200,27 +202,28 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				.getDefaultDisplay();
 				    w = display.getWidth();
 		    h = display.getHeight();
+		   // checkOrientation();
 	}
 
-	public void checkOrientation() {
-		/*
-		rotation = display.getOrientation();
+	public void checkOrientation() {/*
+			rotation = display.getOrientation();
 		if (oldRotation != rotation) {
 			oldRotation = rotation;
 			if (rotation == Surface.ROTATION_90
 					|| rotation == Surface.ROTATION_270) {
-				mEngine.getCamera().setCenter(CAMERA_WIDTH / 2, 540);
+				mEngine.getCamera().setCenter(CAMERA_WIDTH / 2, CAMERA_HEIGHT);
 				scene.setScaleX(.5f);
-				scene.setScaleY(1.4f);
-			} else*/ {
+				scene.setScaleY(1f);
+				bg.setScaleX(1.5f);
+			} else {
 				if (mEngine.getCamera().getCenterY() != CAMERA_HEIGHT / 2) {
 					mEngine.getCamera().setCenter(((CAMERA_WIDTH)/2),
 							CAMERA_HEIGHT);
 				}
 				scene.setScale(1);
-			}
+			}}
 		
-
+*/
 	}
 
 	public void initializePreferences() {
@@ -238,8 +241,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	public EngineOptions onCreateEngineOptions() {
 		zoomCamera = new ZoomCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true,
-				ScreenOrientation.PORTRAIT_FIXED, new RatioResolutionPolicy(
-						CAMERA_WIDTH, CAMERA_HEIGHT), zoomCamera);
+				ScreenOrientation.PORTRAIT_SENSOR,  new org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy(), zoomCamera);
 		engineOptions.getRenderOptions().setDithering(true);
 		return engineOptions;
 		
@@ -809,13 +811,13 @@ Looper.prepare();
 		@Override
 		public void onResume() {
 			super.onResume();
-			PlanetMain.this.onResume();
+		//	PlanetMain.this.onResume();
 		}
 
 		@Override
 		public void onPause() {
 			super.onPause();
-			PlanetMain.this.onPause();
+		//	PlanetMain.this.onPause();
 		}
 
 		@Override
@@ -978,10 +980,31 @@ if (touchEnabled){
 	      return false;
 	    }
 	  }
-
+boolean tempScrollEnabled,oChanged;
 	  @Override 
 	  public void onConfigurationChanged (Configuration newConfig){ 
-	        Log.d("StripedLog", "Error on gestures");
+		  if ((zoomCamera!=null)&&(scene!=null)){
+		  if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+          {
+                  scene.setScale(1);
+                  if (oChanged){
+                  SharedPreferences.Editor geted = mSharedPreferences.edit();
+                  geted.putBoolean("scrollKey", tempScrollEnabled);
+                  geted.commit();
+                  oChanged= false;}
+  				mEngine.getCamera().setCenter(w/2 , h/2);
+          }
+          else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+          {tempScrollEnabled = scrollEnabled;
+                  scene.setScaleY(h/w);
+                 scene.setScaleX(w/h);
+                //  mEngine.getCamera().setCenter(w/2-120, h);
+                 mEngine.getCamera().setCenter(w/4, h);
+                  oChanged= true;
+                  SharedPreferences.Editor geted = mSharedPreferences.edit();
+                  geted.putBoolean("scrollKey", false);
+                  geted.commit();
+          }}
 	  }
 	  
 	public void onLeftSwipe() {
