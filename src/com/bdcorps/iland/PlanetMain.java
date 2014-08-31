@@ -69,8 +69,8 @@ import android.widget.Toast;
 
 public class PlanetMain extends BaseLiveWallpaperService implements
 		OnSharedPreferenceChangeListener, IOffsetsChanged,
-		IOnSceneTouchListener ,YahooWeatherInfoListener,
-	    YahooWeatherExceptionListener,SensorEventListener{
+		IOnSceneTouchListener, YahooWeatherInfoListener,
+		YahooWeatherExceptionListener, SensorEventListener {
 	// ===========================================================
 	// Master TO-DOs
 	// ===========================================================
@@ -88,8 +88,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	int rotation = 1;
 	int oldRotation = 0;
 
-	String tag= "StripedLog";
-	
+	String tag = "StripedLog";
+
 	ZoomCamera zoomCamera;
 	Scene scene;
 
@@ -163,15 +163,16 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	BatchedPseudoSpriteParticleSystem leafSystem;
 	BatchedPseudoSpriteParticleSystem rainSystem;
 	BatchedPseudoSpriteParticleSystem snowSystem;
-	
-	private YahooWeather mYahooWeather = YahooWeather.getInstance(1000, 1000, true);
-	
+
+	private YahooWeather mYahooWeather = YahooWeather.getInstance(1000, 1000,
+			true);
+
 	public final float FILTERING_FACTOR = .11f;
 
 	public SensorManager mSensorManager;
 	public Sensor mAccelerometer;
-	
-	boolean touchEnabled, scrollEnabled=false;
+
+	boolean touchEnabled, scrollEnabled = false;
 
 	// ===========================================================
 	// Constructors
@@ -192,52 +193,52 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		}
 		touchEnabled = mSharedPreferences.getBoolean("touchKey", true);
 		scrollEnabled = mSharedPreferences.getBoolean("scrollKey", true);
-		
-		if (!touchEnabled){sun.setPosition(60, 60);}
+
+		if (!touchEnabled) {
+			sun.setPosition(60, 60);
+		}
 	}
 
 	@Override
 	public void offsetsChanged(float xOffset, float yOffset, float xOffsetStep,
 			float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-/*
-		if (mEngine.getCamera() != null) {
-			mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400);
-		}
-*/
+		/*
+		 * if (mEngine.getCamera() != null) {
+		 * mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400); }
+		 */
 	}
 
 	// ===========================================================
 	// Methods
 	// ===========================================================
 
-	float w,h;
+	float w, h;
+
 	public void loadOrientation() {
 		display = ((WindowManager) getSystemService(WINDOW_SERVICE))
 				.getDefaultDisplay();
-				    w = display.getWidth();
-		    h = display.getHeight();
-		   // checkOrientation();
+		w = display.getWidth();
+		h = display.getHeight();
+		// checkOrientation();
 	}
 
 	public void checkOrientation() {/*
-			rotation = display.getOrientation();
-		if (oldRotation != rotation) {
-			oldRotation = rotation;
-			if (rotation == Surface.ROTATION_90
-					|| rotation == Surface.ROTATION_270) {
-				mEngine.getCamera().setCenter(CAMERA_WIDTH / 2, CAMERA_HEIGHT);
-				scene.setScaleX(.5f);
-				scene.setScaleY(1f);
-				bg.setScaleX(1.5f);
-			} else {
-				if (mEngine.getCamera().getCenterY() != CAMERA_HEIGHT / 2) {
-					mEngine.getCamera().setCenter(((CAMERA_WIDTH)/2),
-							CAMERA_HEIGHT);
-				}
-				scene.setScale(1);
-			}}
-		
-*/
+									 * rotation = display.getOrientation(); if
+									 * (oldRotation != rotation) { oldRotation =
+									 * rotation; if (rotation ==
+									 * Surface.ROTATION_90 || rotation ==
+									 * Surface.ROTATION_270) {
+									 * mEngine.getCamera(
+									 * ).setCenter(CAMERA_WIDTH / 2,
+									 * CAMERA_HEIGHT); scene.setScaleX(.5f);
+									 * scene.setScaleY(1f); bg.setScaleX(1.5f);
+									 * } else { if
+									 * (mEngine.getCamera().getCenterY() !=
+									 * CAMERA_HEIGHT / 2) {
+									 * mEngine.getCamera().setCenter
+									 * (((CAMERA_WIDTH)/2), CAMERA_HEIGHT); }
+									 * scene.setScale(1); }}
+									 */
 	}
 
 	public void initializePreferences() {
@@ -254,19 +255,23 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		zoomCamera = new ZoomCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		EngineOptions engineOptions = new EngineOptions(true,
-				ScreenOrientation.PORTRAIT_SENSOR,  new org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy(), zoomCamera);
+		EngineOptions engineOptions = new EngineOptions(
+				true,
+				ScreenOrientation.PORTRAIT_SENSOR,
+				new org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy(),
+				zoomCamera);
 		engineOptions.getRenderOptions().setDithering(true);
 		return engineOptions;
-		
+
 	}
-	  private GestureDetector gestureDetector;
+
+	private GestureDetector gestureDetector;
 
 	@Override
 	public void onCreateResources(
 			OnCreateResourcesCallback pOnCreateResourcesCallback)
 			throws Exception {
-	    
+
 		scene = new Scene();
 		time = new Time();
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
@@ -280,19 +285,18 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				update();
 			}
 		});
-
 		initializePreferences();
-		// scene.setScale(0.5f);
+		touchEnabled= false;
 
-		mSensorManager = (SensorManager) this.getBaseContext().getSystemService(
-				Context.SENSOR_SERVICE);
+		mSensorManager = (SensorManager) this.getBaseContext()
+				.getSystemService(Context.SENSOR_SERVICE);
 		mSensorManager.registerListener(this,
 				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-				SensorManager.SENSOR_DELAY_FASTEST);  
-		
+				SensorManager.SENSOR_DELAY_FASTEST);
+
 		// BG
-		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 42,
-				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 42, 1300,
+				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
 		bg = new Sprite(0, 0, bgRegion, this.getVertexBufferObjectManager());
@@ -408,20 +412,18 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 		sunModifier = new LoopEntityModifier(new RotationModifier(150, 0, 360));
 		sun.registerEntityModifier(sunModifier);
-/*
-		// Cloud
-		cloudTexture = new BitmapTextureAtlas(this.getTextureManager(), 2100,
-				2100, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		cloudRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
-				cloudTexture, this, "clouds_noon.png", 0, 0);
-		cloud = new Sprite(10, 30, cloudRegion,
-				this.getVertexBufferObjectManager());
-		cloudTexture.load();
-		// scene.attachChild(cloud);
-
-		cloudModifier = new LoopEntityModifier(
-				new RotationModifier(200, 0, 360));
-		cloud.registerEntityModifier(cloudModifier);*/
+		/*
+		 * // Cloud cloudTexture = new
+		 * BitmapTextureAtlas(this.getTextureManager(), 2100, 2100,
+		 * TextureOptions.BILINEAR_PREMULTIPLYALPHA); cloudRegion =
+		 * BitmapTextureAtlasTextureRegionFactory.createFromAsset( cloudTexture,
+		 * this, "clouds_noon.png", 0, 0); cloud = new Sprite(10, 30,
+		 * cloudRegion, this.getVertexBufferObjectManager());
+		 * cloudTexture.load(); // scene.attachChild(cloud);
+		 * 
+		 * cloudModifier = new LoopEntityModifier( new RotationModifier(200, 0,
+		 * 360)); cloud.registerEntityModifier(cloudModifier);
+		 */
 
 		rdTexture = new BitmapTextureAtlas(this.getTextureManager(), 20, 20,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -429,7 +431,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				rdTexture, this, "raindrop.png", 0, 0);
 		rdTexture.load();
 
-rainSystem = new BatchedPseudoSpriteParticleSystem(
+		rainSystem = new BatchedPseudoSpriteParticleSystem(
 				new RectangleParticleEmitter(0f, 0f, CAMERA_HEIGHT,
 						CAMERA_HEIGHT / 2), 1, 3, 100, rdRegion,
 				this.getVertexBufferObjectManager());
@@ -438,7 +440,7 @@ rainSystem = new BatchedPseudoSpriteParticleSystem(
 		// ColorParticleInitializer<Entity>(1, 1, 1));
 		rainSystem
 				.addParticleInitializer(new VelocityParticleInitializer<Entity>(
-						90,100, 120, 135));
+						90, 100, 120, 135));
 		// rainSystem.addParticleInitializer(new
 		// AccelerationParticleInitializer<Entity>(5, 15, 5, 30));
 		rainSystem
@@ -451,7 +453,7 @@ rainSystem = new BatchedPseudoSpriteParticleSystem(
 				0.6f, 0.8f));
 		rainSystem.addParticleModifier(new AlphaParticleModifier<Entity>(6f,
 				10f, 1.0f, 0.0f));
-		//scene.attachChild(rainSystem);
+		// scene.attachChild(rainSystem);
 
 		snowTexture = new BitmapTextureAtlas(this.getTextureManager(), 20, 20,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -459,7 +461,7 @@ rainSystem = new BatchedPseudoSpriteParticleSystem(
 				snowTexture, this, "snow.png", 0, 0);
 		snowTexture.load();
 
-snowSystem = new BatchedPseudoSpriteParticleSystem(
+		snowSystem = new BatchedPseudoSpriteParticleSystem(
 				new RectangleParticleEmitter(0f, 0f, CAMERA_HEIGHT,
 						CAMERA_HEIGHT / 2), 2, 5, 100, snowRegion,
 				this.getVertexBufferObjectManager());
@@ -548,13 +550,11 @@ snowSystem = new BatchedPseudoSpriteParticleSystem(
 		assetsCreated = true;
 
 		loadOrientation();
-Looper.prepare();
-        mYahooWeather.setExceptionListener(this);
+		Looper.prepare();
+		mYahooWeather.setExceptionListener(this);
 
-
-	    gestureDetector = new GestureDetector(
-	                      new SwipeGestureDetector());
-        searchByGPS();
+		gestureDetector = new GestureDetector(new SwipeGestureDetector());
+		searchByGPS();
 		pOnCreateResourcesCallback.onCreateResourcesFinished();
 
 	}
@@ -592,7 +592,7 @@ Looper.prepare();
 				}
 			}
 		}
-		
+
 	}
 
 	int a = 0;
@@ -830,13 +830,13 @@ Looper.prepare();
 		@Override
 		public void onResume() {
 			super.onResume();
-		//	PlanetMain.this.onResume();
+			// PlanetMain.this.onResume();
 		}
 
 		@Override
 		public void onPause() {
 			super.onPause();
-		//	PlanetMain.this.onPause();
+			// PlanetMain.this.onPause();
 		}
 
 		@Override
@@ -848,69 +848,71 @@ Looper.prepare();
 		@Override
 		public void onOffsetsChanged(float xOffset, float yOffset,
 				float xOffsetStep, float yOffsetStep, int xPixelOffset,
-				int yPixelOffset) {	if (mEngine.getCamera() != null) {
-			//	mEngine.getCamera().setCenter((360)-((120 * xOffset) + 60),  mEngine.getCamera().getCenterY());
-			//	mEngine.getCamera().setCenter((w-w/4)-(((w/4) * xOffset)),  mEngine.getCamera().getCenterY());
-							}
-		}
-/*
-		@Override
-		public void onTouchEvent(MotionEvent event) {
-			super.onTouchEvent(event);
-
-			final float touchX = event.getX();
-			final float touchY = event.getY();
-
-			 if (gestureDetector.onTouchEvent(event)) {
-			    
-			    }
-			 
-			switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-				
-			case MotionEvent.ACTION_MOVE:
-				
-
-			case MotionEvent.ACTION_UP:
-			case MotionEvent.ACTION_CANCEL:
-			default:
-				return;
+				int yPixelOffset) {
+			if (mEngine.getCamera() != null) {
+				// mEngine.getCamera().setCenter((360)-((120 * xOffset) + 60),
+				// mEngine.getCamera().getCenterY());
+				// mEngine.getCamera().setCenter((w-w/4)-(((w/4) * xOffset)),
+				// mEngine.getCamera().getCenterY());
 			}
-		}*/
-		
+		}
+
+		/*
+		 * @Override public void onTouchEvent(MotionEvent event) {
+		 * super.onTouchEvent(event);
+		 * 
+		 * final float touchX = event.getX(); final float touchY = event.getY();
+		 * 
+		 * if (gestureDetector.onTouchEvent(event)) {
+		 * 
+		 * }
+		 * 
+		 * switch (event.getAction()) { case MotionEvent.ACTION_DOWN:
+		 * 
+		 * case MotionEvent.ACTION_MOVE:
+		 * 
+		 * 
+		 * case MotionEvent.ACTION_UP: case MotionEvent.ACTION_CANCEL: default:
+		 * return; } }
+		 */
+
 		@Override
 		public void onTouchEvent(MotionEvent event) {
 			super.onTouchEvent(event);
 
 			final float touchX = event.getX();
 			final float touchY = event.getY();
-			/* if (gestureDetector.onTouchEvent(event)) {
-				   
-			    }*/
+			/*
+			 * if (gestureDetector.onTouchEvent(event)) {
+			 * 
+			 * }
+			 */
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
-				if (touchEnabled){	if (event.getY() < 0) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
-				} else if (event.getY() > CAMERA_HEIGHT / 2) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							CAMERA_HEIGHT / 2);
-				} else {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							event.getY() - sun.getHeight() / 2);
-				}
+				if (touchEnabled) {
+					if (event.getY() < 0) {
+						sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
+					} else if (event.getY() > CAMERA_HEIGHT / 2) {
+						sun.setPosition(event.getX() - sun.getWidth() / 2,
+								CAMERA_HEIGHT / 2);
+					} else {
+						sun.setPosition(event.getX() - sun.getWidth() / 2,
+								event.getY() - sun.getHeight() / 2);
+					}
 				}
 				return;
 			case MotionEvent.ACTION_MOVE:
-if (touchEnabled){
-				if (event.getY() < 0) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
-				} else if (event.getY() > CAMERA_HEIGHT / 2) {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							CAMERA_HEIGHT / 2);
-				} else {
-					sun.setPosition(event.getX() - sun.getWidth() / 2,
-							event.getY() - sun.getHeight() / 2);
-				}}
+				if (touchEnabled) {
+					if (event.getY() < 0) {
+						sun.setPosition(event.getX() - sun.getWidth() / 2, 0);
+					} else if (event.getY() > CAMERA_HEIGHT / 2) {
+						sun.setPosition(event.getX() - sun.getWidth() / 2,
+								CAMERA_HEIGHT / 2);
+					} else {
+						sun.setPosition(event.getX() - sun.getWidth() / 2,
+								event.getY() - sun.getHeight() / 2);
+					}
+				}
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 			default:
@@ -922,145 +924,169 @@ if (touchEnabled){
 	@Override
 	public void onFailConnection(Exception e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onFailParsing(Exception e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onFailFindLocation(Exception e) {
-		// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub
 	}
-	
+
 	@Override
 	public void gotWeatherInfo(WeatherInfo weatherInfo) {
-		   if (weatherInfo != null) {
-   			//if (leafSystem != null)
-   			{scene.detachChild(leafSystem);}
-			   
-			if ((weatherInfo.getCurrentCode()>0&&weatherInfo.getCurrentCode()<=12)||(weatherInfo.getCurrentCode()==46))   {
-					  //rain
-   			scene.attachChild(rainSystem);
-				/*
-		        Log.d("StripedLog", 
-		        		String.valueOf(weatherInfo.getCurrentCode()));
-		        	*/}else if ((weatherInfo.getCurrentCode()>=15&&weatherInfo.getCurrentCode()<=18)||(weatherInfo.getCurrentCode()>=41&&weatherInfo.getCurrentCode()<=43)){//snow
+		if (weatherInfo != null) {
+			// if (leafSystem != null)
+			{
+				scene.detachChild(leafSystem);
+			}
 
-						scene.attachChild(snowSystem);	}else 
-		        		{
-		        		{scene.detachChild(leafSystem);}
-		        			{scene.detachChild(rainSystem);}
-		        			{scene.detachChild(snowSystem);}}
-		   }
+			if ((weatherInfo.getCurrentCode() > 0 && weatherInfo
+					.getCurrentCode() <= 12)
+					|| (weatherInfo.getCurrentCode() == 46)) {
+				// rain
+				scene.attachChild(rainSystem);
+				/*
+				 * Log.d("StripedLog",
+				 * String.valueOf(weatherInfo.getCurrentCode()));
+				 */} else if ((weatherInfo.getCurrentCode() >= 15 && weatherInfo
+					.getCurrentCode() <= 18)
+					|| (weatherInfo.getCurrentCode() >= 41 && weatherInfo
+							.getCurrentCode() <= 43)) {// snow
+
+				scene.attachChild(snowSystem);
+			} else {
+				{
+					scene.detachChild(leafSystem);
+				}
+				{
+					scene.detachChild(rainSystem);
+				}
+				{
+					scene.detachChild(snowSystem);
+				}
+			}
+		}
 	}
-	
+
 	private void searchByGPS() {
 		mYahooWeather.setSearchMode(SEARCH_MODE.GPS);
 		mYahooWeather.queryYahooWeatherByGPS(getApplicationContext(), this);
 	}
-	
-	
-	  // Private class for gestures
-	  private class SwipeGestureDetector 
-	          extends SimpleOnGestureListener {
-	    // Swipe properties, you can change it to make the swipe 
-	    // longer or shorter and speed
-	    private static final int SWIPE_MIN_DISTANCE = 120;
-	    private static final int SWIPE_MAX_OFF_PATH = 200;
-	    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
-	    @Override
-	    public boolean onFling(MotionEvent e1, MotionEvent e2,
-	                         float velocityX, float velocityY) {
-	      try {
-	        float diffAbs = Math.abs(e1.getY() - e2.getY());
-	        float diff = e1.getX() - e2.getX();
+	// Private class for gestures
+	private class SwipeGestureDetector extends SimpleOnGestureListener {
+		// Swipe properties, you can change it to make the swipe
+		// longer or shorter and speed
+		private static final int SWIPE_MIN_DISTANCE = 120;
+		private static final int SWIPE_MAX_OFF_PATH = 200;
+		private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
-	        if (diffAbs > SWIPE_MAX_OFF_PATH)
-	          return false;
-	        
-	        // Left swipe
-	        if (diff > SWIPE_MIN_DISTANCE
-	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	          onLeftSwipe();
+		@Override
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+				float velocityY) {
+			try {
+				float diffAbs = Math.abs(e1.getY() - e2.getY());
+				float diff = e1.getX() - e2.getX();
 
-	        // Right swipe
-	        } else if (-diff > SWIPE_MIN_DISTANCE
-	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	        	onRightSwipe();
-	        }
-	      } catch (Exception e) {
-	        Log.e("YourActivity", "Error on gestures");
-	      }
-	      return false;
-	    }
-	  }
-boolean tempScrollEnabled,oChanged;
-	  @Override 
-	  public void onConfigurationChanged (Configuration newConfig){ 
-		  if ((zoomCamera!=null)&&(scene!=null)){
-		  if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
-          {
-                  scene.setScale(1);
-                  if (oChanged){
-                  SharedPreferences.Editor geted = mSharedPreferences.edit();
-                  geted.putBoolean("scrollKey", tempScrollEnabled);
-                  geted.commit();
-                  oChanged= false;}
-  				mEngine.getCamera().setCenter(w/2 , h/2);
-          }
-          else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
-          {tempScrollEnabled = scrollEnabled;
-                  scene.setScaleY(h/w);
-                 scene.setScaleX(w/h);
-                 mEngine.getCamera().setCenter(w/4, h);
-                  oChanged= true;
-                  SharedPreferences.Editor geted = mSharedPreferences.edit();
-                  geted.putBoolean("scrollKey", false);
-                  geted.commit();
-          }}
-	  }
-	
-	  //**************************************************************************************************
-	  //Scroll Replaced by Accelerometer Tilt for now: 2.41
+				if (diffAbs > SWIPE_MAX_OFF_PATH)
+					return false;
+
+				// Left swipe
+				if (diff > SWIPE_MIN_DISTANCE
+						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+					onLeftSwipe();
+
+					// Right swipe
+				} else if (-diff > SWIPE_MIN_DISTANCE
+						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+					onRightSwipe();
+				}
+			} catch (Exception e) {
+				Log.e("YourActivity", "Error on gestures");
+			}
+			return false;
+		}
+	}
+
+	boolean tempScrollEnabled, oChanged;
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		if ((zoomCamera != null) && (scene != null)) {
+			if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+				scene.setScale(1);
+			/*	if (oChanged) {
+					SharedPreferences.Editor geted = mSharedPreferences.edit();
+					geted.putBoolean("scrollKey", tempScrollEnabled);
+					geted.commit();
+					oChanged = false;
+				}*/
+				mEngine.getCamera().setCenter(w / 2, h / 2);
+			} else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+								scene.setScaleY(h / w);
+				scene.setScaleX(w / h);
+				mEngine.getCamera().setCenter(w / 4, h);
+				/*oChanged = true;
+				 * tempScrollEnabled = scrollEnabled;
+				SharedPreferences.Editor geted = mSharedPreferences.edit();
+				geted.putBoolean("scrollKey", false);
+				geted.commit();*/
+			}
+		}
+	}
+
+	// **************************************************************************************************
+	// Scroll Replaced by Accelerometer Tilt for now: 2.41
 	public void onLeftSwipe() {/*
-		if (scrollEnabled){
-		if (mEngine.getCamera().getCenterX()>((w/2)-2*(w/6))){
-	mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()-(w/6),  mEngine.getCamera().getCenterY());}}
-	*/}
+								 * if (scrollEnabled){ if
+								 * (mEngine.getCamera().getCenterX
+								 * ()>((w/2)-2*(w/6))){
+								 * mEngine.getCamera().setCenter
+								 * (mEngine.getCamera().getCenterX()-(w/6),
+								 * mEngine.getCamera().getCenterY());}}
+								 */
+	}
 
 	public void onRightSwipe() {
-/*		if (scrollEnabled){if (mEngine.getCamera().getCenterX()<((w/2)+2*(w/6))){
-		mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()+(w/6),  mEngine.getCamera().getCenterY());	}
-}*/}
+		/*
+		 * if (scrollEnabled){if
+		 * (mEngine.getCamera().getCenterX()<((w/2)+2*(w/6))){
+		 * mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()+(w/6),
+		 * mEngine.getCamera().getCenterY()); } }
+		 */}
 
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	float x;
+
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
-return;		
+			return;
 		try {
-		float x = event.values[0]*FILTERING_FACTOR;
-			//x=(float) (-event.values[1] * FILTERING_FACTOR + x
-				//	* (1.0 - FILTERING_FACTOR));
-			
-		//	if (x < 0.25 &&x > -0.25)
-		if(w!=0)	{				
-                mEngine.getCamera().setCenter(((w/2)+(x*15)), h/2);
+			float x = event.values[0] * FILTERING_FACTOR;
+			// x=(float) (-event.values[1] * FILTERING_FACTOR + x
+			// * (1.0 - FILTERING_FACTOR));
+
+			// if (x < 0.25 &&x > -0.25)
+			if (w != 0) {
+				mEngine.getCamera().setCenter(((w / 2) + (x * 15)), h / 2);
 			}
 		} catch (NullPointerException ex) {
 			Log.d(tag, ex.toString());
 		} catch (RuntimeException ex) {
 			Log.d(tag, ex.toString());
 		}
-		
-	}}
+
+	}
+}
