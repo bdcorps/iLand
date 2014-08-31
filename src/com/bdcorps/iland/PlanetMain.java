@@ -46,9 +46,14 @@ import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Looper;
@@ -65,7 +70,7 @@ import android.widget.Toast;
 public class PlanetMain extends BaseLiveWallpaperService implements
 		OnSharedPreferenceChangeListener, IOffsetsChanged,
 		IOnSceneTouchListener ,YahooWeatherInfoListener,
-	    YahooWeatherExceptionListener{
+	    YahooWeatherExceptionListener,SensorEventListener{
 	// ===========================================================
 	// Master TO-DOs
 	// ===========================================================
@@ -83,6 +88,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	int rotation = 1;
 	int oldRotation = 0;
 
+	String tag= "StripedLog";
+	
 	ZoomCamera zoomCamera;
 	Scene scene;
 
@@ -159,6 +166,11 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	
 	private YahooWeather mYahooWeather = YahooWeather.getInstance(1000, 1000, true);
 	
+	public final float FILTERING_FACTOR = .11f;
+
+	public SensorManager mSensorManager;
+	public Sensor mAccelerometer;
+	
 	boolean touchEnabled, scrollEnabled=false;
 
 	// ===========================================================
@@ -180,6 +192,8 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		}
 		touchEnabled = mSharedPreferences.getBoolean("touchKey", true);
 		scrollEnabled = mSharedPreferences.getBoolean("scrollKey", true);
+		
+		if (!touchEnabled){sun.setPosition(60, 60);}
 	}
 
 	@Override
@@ -270,8 +284,12 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		initializePreferences();
 		// scene.setScale(0.5f);
 
-
-        
+		mSensorManager = (SensorManager) this.getBaseContext().getSystemService(
+				Context.SENSOR_SERVICE);
+		mSensorManager.registerListener(this,
+				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+				SensorManager.SENSOR_DELAY_FASTEST);  
+		
 		// BG
 		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1536,
 				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -967,12 +985,12 @@ if (touchEnabled){
 	        // Left swipe
 	        if (diff > SWIPE_MIN_DISTANCE
 	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	       //   onLeftSwipe();
+	          onLeftSwipe();
 
 	        // Right swipe
 	        } else if (-diff > SWIPE_MIN_DISTANCE
 	        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	       // 	onRightSwipe();
+	        	onRightSwipe();
 	        }
 	      } catch (Exception e) {
 	        Log.e("YourActivity", "Error on gestures");
@@ -982,7 +1000,7 @@ if (touchEnabled){
 	  }
 boolean tempScrollEnabled,oChanged;
 	  @Override 
-	  public void onConfigurationChanged (Configuration newConfig){ /*
+	  public void onConfigurationChanged (Configuration newConfig){ 
 		  if ((zoomCamera!=null)&&(scene!=null)){
 		  if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
           {
@@ -998,24 +1016,50 @@ boolean tempScrollEnabled,oChanged;
           {tempScrollEnabled = scrollEnabled;
                   scene.setScaleY(h/w);
                  scene.setScaleX(w/h);
-                //  mEngine.getCamera().setCenter(w/2-120, h);
                  mEngine.getCamera().setCenter(w/4, h);
                   oChanged= true;
                   SharedPreferences.Editor geted = mSharedPreferences.edit();
                   geted.putBoolean("scrollKey", false);
                   geted.commit();
-          }}*/
+          }}
 	  }
-	  /*
-	public void onLeftSwipe() {
-	//	mEngine.getCamera().setCenter((w-w/4)-(((w/4) * 0.5f) + (w-w/4)/6),  mEngine.getCamera().getCenterY());
-		//mEngine.getCamera().setCenter(((480 * 0.5f)),  mEngine.getCamera().getCenterY());
+	
+	  //**************************************************************************************************
+	  //Scroll Replaced by Accelerometer Tilt for now: 2.41
+	public void onLeftSwipe() {/*
 		if (scrollEnabled){
 		if (mEngine.getCamera().getCenterX()>((w/2)-2*(w/6))){
 	mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()-(w/6),  mEngine.getCamera().getCenterY());}}
-	}
+	*/}
 
 	public void onRightSwipe() {
-		if (scrollEnabled){if (mEngine.getCamera().getCenterX()<((w/2)+2*(w/6))){
+/*		if (scrollEnabled){if (mEngine.getCamera().getCenterX()<((w/2)+2*(w/6))){
 		mEngine.getCamera().setCenter(mEngine.getCamera().getCenterX()+(w/6),  mEngine.getCamera().getCenterY());	}
-}}*/}
+}*/}
+
+	@Override
+	public void onAccuracyChanged(Sensor arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	float x;
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
+return;		
+		try {
+		float x = event.values[0]*FILTERING_FACTOR;
+			//x=(float) (-event.values[1] * FILTERING_FACTOR + x
+				//	* (1.0 - FILTERING_FACTOR));
+			
+		//	if (x < 0.25 &&x > -0.25)
+		if(w!=0)	{				
+                mEngine.getCamera().setCenter(((w/2)+(x*15)), h/2);
+			}
+		} catch (NullPointerException ex) {
+			Log.d(tag, ex.toString());
+		} catch (RuntimeException ex) {
+			Log.d(tag, ex.toString());
+		}
+		
+	}}
