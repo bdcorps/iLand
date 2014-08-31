@@ -291,12 +291,13 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				SensorManager.SENSOR_DELAY_FASTEST);  
 		
 		// BG
-		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1536,
+		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 42,
 				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
-		bg = new Sprite(-1536/2, 0, bgRegion, this.getVertexBufferObjectManager());
+		bg = new Sprite(0, 0, bgRegion, this.getVertexBufferObjectManager());
 		bgTexture.load();
+		bg.setScaleX(35f);
 		scene.attachChild(bg);
 		/*
 		 * scene.setBackgroundEnabled(true);
@@ -883,9 +884,9 @@ Looper.prepare();
 
 			final float touchX = event.getX();
 			final float touchY = event.getY();
-			 if (gestureDetector.onTouchEvent(event)) {
+			/* if (gestureDetector.onTouchEvent(event)) {
 				   
-			    }
+			    }*/
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 				if (touchEnabled){	if (event.getY() < 0) {
