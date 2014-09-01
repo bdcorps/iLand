@@ -172,7 +172,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	public SensorManager mSensorManager;
 	public Sensor mAccelerometer;
 
-	boolean touchEnabled, scrollEnabled = false;
+	boolean touchEnabled;// scrollEnabled = false;
 
 	// ===========================================================
 	// Constructors
@@ -190,14 +190,14 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 			String pKey) {
 		if (assetsCreated) {
 			resetAndroidAsset();
-		}
-		touchEnabled = mSharedPreferences.getBoolean("touchKey", true);
-		scrollEnabled = mSharedPreferences.getBoolean("scrollKey", true);
+			touchEnabled = mSharedPreferences.getBoolean("touchKey", true);
+			//scrollEnabled = mSharedPreferences.getBoolean("scrollKey", true);
 
-		if (!touchEnabled) {
-			sun.setPosition(60, 60);
+			if (!touchEnabled) {
+				sun.setPosition(60, 60);
+			}
 		}
-	}
+			}
 
 	@Override
 	public void offsetsChanged(float xOffset, float yOffset, float xOffsetStep,
@@ -301,7 +301,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
 		bg = new Sprite(0, 0, bgRegion, this.getVertexBufferObjectManager());
 		bgTexture.load();
-		bg.setScaleX(35f);
+		bg.setScaleX(50f);
 		scene.attachChild(bg);
 		/*
 		 * scene.setBackgroundEnabled(true);
@@ -1014,12 +1014,17 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		}
 	}
 
-	boolean tempScrollEnabled, oChanged;
-
+	//boolean tempScrollEnabled, oChanged;
+String o= "port";
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
+		if (assetsCreated){
 		if ((zoomCamera != null) && (scene != null)) {
 			if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+				w = display.getWidth();
+				h = display.getHeight();
+				o= "port";
+				sun.setPosition(60, 60);
 				scene.setScale(1);
 			/*	if (oChanged) {
 					SharedPreferences.Editor geted = mSharedPreferences.edit();
@@ -1029,16 +1034,20 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				}*/
 				mEngine.getCamera().setCenter(w / 2, h / 2);
 			} else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				h = display.getWidth();
+				w = display.getHeight();
+				o= "land";
 								scene.setScaleY(h / w);
 				scene.setScaleX(w / h);
-				mEngine.getCamera().setCenter(w / 4, h);
+				mEngine.getCamera().setCenter(w/4, h);
+				sun.setPosition(-(w/4), w/2+60);
 				/*oChanged = true;
 				 * tempScrollEnabled = scrollEnabled;
 				SharedPreferences.Editor geted = mSharedPreferences.edit();
 				geted.putBoolean("scrollKey", false);
 				geted.commit();*/
 			}
-		}
+		}}
 	}
 
 	// **************************************************************************************************
@@ -1080,8 +1089,11 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 			// if (x < 0.25 &&x > -0.25)
 			if (w != 0) {
-				mEngine.getCamera().setCenter(((w / 2) + (x * 15)), h / 2);
-			}
+				if (o.equals("port")){
+				mEngine.getCamera().setCenter(((w/2) + (x * 15)),mEngine.getCamera().getCenterY());
+				}else if (o.equals("land")){
+					mEngine.getCamera().setCenter(((w/4) + (x * 15)),mEngine.getCamera().getCenterY());
+				}}
 		} catch (NullPointerException ex) {
 			Log.d(tag, ex.toString());
 		} catch (RuntimeException ex) {
