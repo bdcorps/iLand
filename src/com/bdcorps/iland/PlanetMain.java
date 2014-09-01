@@ -301,7 +301,6 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
 		bg = new Sprite(0, 0, bgRegion, this.getVertexBufferObjectManager());
 		bgTexture.load();
-		bg.setScaleX(50f);
 		scene.attachChild(bg);
 		/*
 		 * scene.setBackgroundEnabled(true);
@@ -1021,11 +1020,11 @@ String o= "port";
 		if (assetsCreated){
 		if ((zoomCamera != null) && (scene != null)) {
 			if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-				w = display.getWidth();
+				/*w = display.getWidth();
 				h = display.getHeight();
 				o= "port";
 				sun.setPosition(60, 60);
-				scene.setScale(1);
+				scene.setScale(1);*/
 			/*	if (oChanged) {
 					SharedPreferences.Editor geted = mSharedPreferences.edit();
 					geted.putBoolean("scrollKey", tempScrollEnabled);
@@ -1037,10 +1036,10 @@ String o= "port";
 				h = display.getWidth();
 				w = display.getHeight();
 				o= "land";
-								scene.setScaleY(h / w);
+			/*					scene.setScaleY(h / w);
 				scene.setScaleX(w / h);
 				mEngine.getCamera().setCenter(w/4, h);
-				sun.setPosition(-(w/4), w/2+60);
+				sun.setPosition(-(w/4), w/2+60);*/
 				/*oChanged = true;
 				 * tempScrollEnabled = scrollEnabled;
 				SharedPreferences.Editor geted = mSharedPreferences.edit();
