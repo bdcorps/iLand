@@ -9,7 +9,7 @@
             android:key="touchKey"
             android:summary="Move sun/moon with touch controls"
             android:title="Touch Enabled" />
-    <!--     <CheckBoxPreference
+     <!--   <CheckBoxPreference
             android:defaultValue="false"
             android:key="scrollKey"
             android:summary="Scroll the screen when swiped left/right"

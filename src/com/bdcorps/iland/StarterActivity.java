@@ -27,7 +27,7 @@ public class StarterActivity extends Activity {
 		    Toast.makeText(getApplicationContext(),
 					"Select 'iLand' from the list", Toast.LENGTH_LONG).show();
 		}
-
+		
 		this.startActivityForResult(i, 0);
 
 		finish();

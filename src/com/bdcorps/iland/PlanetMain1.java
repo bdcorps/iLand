@@ -1,9 +1,14 @@
 package com.bdcorps.iland;
 
+import java.util.logging.LogRecord;
+
+import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
+import org.andengine.engine.options.resolutionpolicy.FixedResolutionPolicy;
+import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
@@ -37,12 +42,11 @@ import org.andengine.util.modifier.ease.EaseBackInCustom;
 
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather;
-import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
@@ -57,12 +61,13 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.WindowManager;
-import com.bdcorps.iland.KickStarterActivity;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.widget.Toast;
 
-public class PlanetMain extends BaseLiveWallpaperService implements
+public class PlanetMain1 extends BaseLiveWallpaperService implements
 		OnSharedPreferenceChangeListener, IOffsetsChanged,
 		IOnSceneTouchListener, YahooWeatherInfoListener,
 		YahooWeatherExceptionListener, SensorEventListener {
@@ -203,11 +208,6 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		w = display.getWidth();
 		h = display.getHeight();
 		// checkOrientation();
-
-		Intent i1 = new Intent();
-		i1.setClass(this, KickStarterActivity.class);
-		i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(i1);
 	}
 
 	public void checkOrientation() {/*
@@ -230,7 +230,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	}
 
 	public void initializePreferences() {
-		mSharedPreferences = PlanetMain.this.getSharedPreferences(
+		mSharedPreferences = PlanetMain1.this.getSharedPreferences(
 				SHARED_PREFS_NAME, 0);
 		mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		onSharedPreferenceChanged(mSharedPreferences, null);
@@ -660,8 +660,6 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 			 * scene_1.registerEntityModifier(planet_move); move(planet_1, "up",
 			 * 5); planet_1.registerEntityModifier(planet_move);
 			 */
-			
-			
 		}
 	}
 
@@ -687,7 +685,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	private void move(final Sprite spr, String dir, int delay) {
 		if (dir == "down") {
 			planet_move = new SequenceEntityModifier(new DelayModifier(delay),
-					new MoveYModifier(6, spr.getY(), spr.getY() + 400,
+					new MoveYModifier(8, spr.getY(), spr.getY() + 400,
 							EaseBackInCustom.getInstance()) {
 						@Override
 						protected void onModifierFinished(IEntity pItem) {
@@ -699,7 +697,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 		} else if (dir == "up") {
 			planet_move = new SequenceEntityModifier(new DelayModifier(delay),
-					new MoveYModifier(6, spr.getY(), spr.getY() - 400,
+					new MoveYModifier(8, spr.getY(), spr.getY() - 400,
 							EaseBackInCustom.getInstance()) {
 						@Override
 						protected void onModifierFinished(IEntity pItem) {
@@ -778,15 +776,15 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		public MyBaseWallpaperGLEngine(final IRendererListener pRendererListener) {
 
 			if (this.mConfigChooser == null) {
-				PlanetMain.this.mEngine.getEngineOptions().getRenderOptions()
+				PlanetMain1.this.mEngine.getEngineOptions().getRenderOptions()
 						.setMultiSampling(false);
-				this.mConfigChooser = new ConfigChooser(PlanetMain.this.mEngine
+				this.mConfigChooser = new ConfigChooser(PlanetMain1.this.mEngine
 						.getEngineOptions().getRenderOptions()
 						.isMultiSampling());
 			}
 			this.setEGLConfigChooser(this.mConfigChooser);
 
-			this.mEngineRenderer = new EngineRenderer(PlanetMain.this.mEngine,
+			this.mEngineRenderer = new EngineRenderer(PlanetMain1.this.mEngine,
 					this.mConfigChooser, pRendererListener);
 			this.setRenderer(this.mEngineRenderer);
 			this.setRenderMode(GLEngine.RENDERMODE_CONTINUOUSLY);

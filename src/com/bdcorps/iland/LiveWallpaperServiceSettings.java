@@ -1,5 +1,6 @@
 package com.bdcorps.iland;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
