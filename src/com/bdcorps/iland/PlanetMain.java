@@ -4,6 +4,7 @@ import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
+import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
@@ -203,11 +204,6 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		w = display.getWidth();
 		h = display.getHeight();
 		// checkOrientation();
-
-		Intent i1 = new Intent();
-		i1.setClass(this, KickStarterActivity.class);
-		i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(i1);
 	}
 
 	public void checkOrientation() {/*
@@ -246,8 +242,10 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 		EngineOptions engineOptions = new EngineOptions(
 				true,
 				ScreenOrientation.PORTRAIT_SENSOR,
-				new org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy(),
+				new RatioResolutionPolicy(w, h),
 				zoomCamera);
+
+zoomCamera.setResizeOnSurfaceSizeChanged(true);
 		engineOptions.getRenderOptions().setDithering(true);
 		return engineOptions;
 
@@ -273,6 +271,13 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 				update();
 			}
 		});
+		
+
+		Intent i1 = new Intent();
+		i1.setClass(this, KickStarterActivity.class);
+		i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(i1);
+		
 		initializePreferences();
 		touchEnabled= false;
 
@@ -687,7 +692,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	private void move(final Sprite spr, String dir, int delay) {
 		if (dir == "down") {
 			planet_move = new SequenceEntityModifier(new DelayModifier(delay),
-					new MoveYModifier(6, spr.getY(), spr.getY() + 400,
+					new MoveYModifier(8, spr.getY(), spr.getY() + 400,
 							EaseBackInCustom.getInstance()) {
 						@Override
 						protected void onModifierFinished(IEntity pItem) {
@@ -699,7 +704,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 		} else if (dir == "up") {
 			planet_move = new SequenceEntityModifier(new DelayModifier(delay),
-					new MoveYModifier(6, spr.getY(), spr.getY() - 400,
+					new MoveYModifier(8, spr.getY(), spr.getY() - 400,
 							EaseBackInCustom.getInstance()) {
 						@Override
 						protected void onModifierFinished(IEntity pItem) {
@@ -1009,19 +1014,22 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 	public void onConfigurationChanged(Configuration newConfig) {
 		if ((zoomCamera != null) && (scene != null)) {
 			if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-				scene.setScale(1);
-			/*	if (oChanged) {
+				scene.setScale(1);//this.mEngine.getCamera().set(0, 0, w, h);
+							/*	if (oChanged) {
 					SharedPreferences.Editor geted = mSharedPreferences.edit();
 					geted.putBoolean("scrollKey", tempScrollEnabled);
 					geted.commit();
 					oChanged = false;
 				}*/
-				mEngine.getCamera().setCenter(w / 2, h / 2);
+			//	
 			} else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-								scene.setScaleY(h / w);
-				scene.setScaleX(w / h);
-				mEngine.getCamera().setCenter(w / 4, h);
-				/*oChanged = true;
+				//this.mEngine.getCamera().set(0, 0,  w,h);
+				
+				
+				//			scene.setScaleY(h / w);
+			//scene.setScaleX(w / h);
+			//	mEngine.getCamera().setCenter(w , 0);
+					/*oChanged = true;
 				 * tempScrollEnabled = scrollEnabled;
 				SharedPreferences.Editor geted = mSharedPreferences.edit();
 				geted.putBoolean("scrollKey", false);
@@ -1069,7 +1077,7 @@ public class PlanetMain extends BaseLiveWallpaperService implements
 
 			// if (x < 0.25 &&x > -0.25)
 			if (w != 0) {
-				mEngine.getCamera().setCenter(((w / 2) + (x * 15)), h / 2);
+		//		mEngine.getCamera().setCenter(((w / 2) + (x * 15)), h / 2);
 			}
 		} catch (NullPointerException ex) {
 			Log.d(tag, ex.toString());
