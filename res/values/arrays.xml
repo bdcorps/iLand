@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="androidTypeArray">
+		<item>"Green"</item>
+		<item>"Blue"</item>
+	</string-array>
+	
+	<string-array name="androidTypeValues">
+		<item>"android.png"</item>
+		<item>"androidBlue.png"</item>
+	</string-array>
+
+</resources>

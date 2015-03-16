@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">iLand</string>
+    <string name="wallpaper_description">A visually pleasing Live Wallpaper thats changes colour according to the time of the day</string>
+
+    <!-- Settings -->
+    <string name="wallpaper_settings">Settings</string>
+    
+    <!-- Touch Input Setting -->
+   
+    <string name="creditTitle">Thank You</string>
+	<string name="thanksTitle">Thanks!</string>
+	<string name="thanksDescription">Thank You for installing!</string>
+</resources>
+
+
