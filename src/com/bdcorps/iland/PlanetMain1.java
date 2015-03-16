@@ -190,8 +190,8 @@ public class PlanetMain1 extends BaseLiveWallpaperService implements
 	@Override
 	public void offsetsChanged(float xOffset, float yOffset, float xOffsetStep,
 			float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-		
-		 /* if (mEngine.getCamera() != null) {
+		/*
+		 * if (mEngine.getCamera() != null) {
 		 * mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400); }
 		 */
 	}
@@ -274,7 +274,7 @@ public class PlanetMain1 extends BaseLiveWallpaperService implements
 			}
 		});
 		initializePreferences();
-		touchEnabled= false;
+		touchEnabled = false;
 
 		mSensorManager = (SensorManager) this.getBaseContext()
 				.getSystemService(Context.SENSOR_SERVICE);
@@ -283,11 +283,12 @@ public class PlanetMain1 extends BaseLiveWallpaperService implements
 				SensorManager.SENSOR_DELAY_FASTEST);
 
 		// BG
-		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1536, 1300,
-				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		bgTexture = new BitmapTextureAtlas(this.getTextureManager(), 1536,
+				1300, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		bgRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
 				bgTexture, this, "bg_" + assetSuffix + ".png", 0, 0);
-		bg = new Sprite(-1536/2, 0, bgRegion, this.getVertexBufferObjectManager());
+		bg = new Sprite(-1536 / 2, 0, bgRegion,
+				this.getVertexBufferObjectManager());
 		bgTexture.load();
 		scene.attachChild(bg);
 		/*
@@ -778,9 +779,9 @@ public class PlanetMain1 extends BaseLiveWallpaperService implements
 			if (this.mConfigChooser == null) {
 				PlanetMain1.this.mEngine.getEngineOptions().getRenderOptions()
 						.setMultiSampling(false);
-				this.mConfigChooser = new ConfigChooser(PlanetMain1.this.mEngine
-						.getEngineOptions().getRenderOptions()
-						.isMultiSampling());
+				this.mConfigChooser = new ConfigChooser(
+						PlanetMain1.this.mEngine.getEngineOptions()
+								.getRenderOptions().isMultiSampling());
 			}
 			this.setEGLConfigChooser(this.mConfigChooser);
 
@@ -1008,22 +1009,21 @@ public class PlanetMain1 extends BaseLiveWallpaperService implements
 		if ((zoomCamera != null) && (scene != null)) {
 			if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
 				scene.setScale(1);
-			/*	if (oChanged) {
-					SharedPreferences.Editor geted = mSharedPreferences.edit();
-					geted.putBoolean("scrollKey", tempScrollEnabled);
-					geted.commit();
-					oChanged = false;
-				}*/
+				/*
+				 * if (oChanged) { SharedPreferences.Editor geted =
+				 * mSharedPreferences.edit(); geted.putBoolean("scrollKey",
+				 * tempScrollEnabled); geted.commit(); oChanged = false; }
+				 */
 				mEngine.getCamera().setCenter(w / 2, h / 2);
 			} else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-								scene.setScaleY(h / w);
+				scene.setScaleY(h / w);
 				scene.setScaleX(w / h);
 				mEngine.getCamera().setCenter(w / 4, h);
-				/*oChanged = true;
-				 * tempScrollEnabled = scrollEnabled;
-				SharedPreferences.Editor geted = mSharedPreferences.edit();
-				geted.putBoolean("scrollKey", false);
-				geted.commit();*/
+				/*
+				 * oChanged = true; tempScrollEnabled = scrollEnabled;
+				 * SharedPreferences.Editor geted = mSharedPreferences.edit();
+				 * geted.putBoolean("scrollKey", false); geted.commit();
+				 */
 			}
 		}
 	}
