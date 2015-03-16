@@ -190,8 +190,8 @@ public class PlanetMain1 extends BaseLiveWallpaperService implements
 	@Override
 	public void offsetsChanged(float xOffset, float yOffset, float xOffsetStep,
 			float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-		/*
-		 * if (mEngine.getCamera() != null) {
+		
+		 /* if (mEngine.getCamera() != null) {
 		 * mEngine.getCamera().setCenter(((480 * xOffset) + 240), 400); }
 		 */
 	}
