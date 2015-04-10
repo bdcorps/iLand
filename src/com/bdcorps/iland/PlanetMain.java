@@ -9,6 +9,7 @@ import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.LoopEntityModifier;
+import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.MoveYModifier;
 import org.andengine.entity.modifier.RotationModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
@@ -43,7 +44,6 @@ import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
@@ -61,7 +61,6 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.WindowManager;
-import com.bdcorps.iland.KickStarterActivity;
 
 public class PlanetMain extends BaseLiveWallpaperService implements
 		OnSharedPreferenceChangeListener, IOffsetsChanged,
@@ -273,11 +272,6 @@ zoomCamera.setResizeOnSurfaceSizeChanged(true);
 		});
 		
 
-		Intent i1 = new Intent();
-		i1.setClass(this, KickStarterActivity.class);
-		i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(i1);
-		
 		initializePreferences();
 		touchEnabled= false;
 
@@ -400,10 +394,23 @@ zoomCamera.setResizeOnSurfaceSizeChanged(true);
 				sunTexture, this, "sun_" + assetSuffix + ".png", 0, 0);
 		sun = new Sprite(60, 60, sunRegion, this.getVertexBufferObjectManager());
 		sunTexture.load();
-		scene.attachChild(sun);
 
-		sunModifier = new LoopEntityModifier(new RotationModifier(150, 0, 360));
-		sun.registerEntityModifier(sunModifier);
+		if (assetSuffix.equals("night")){
+			
+		sunModifier=	new LoopEntityModifier(new SequenceEntityModifier(new RotationModifier(
+                30, 0,-360              
+            )));
+		sun.registerEntityModifier(sunModifier);}else {
+            	sunModifier=	new LoopEntityModifier(new SequenceEntityModifier(new RotationModifier(
+                    30, 45,-45             
+                    ),new RotationModifier(
+                            30, -45,45          
+                            )));
+    			sun.registerEntityModifier(sunModifier);}
+		
+
+		scene.attachChild(sun);
+		
 		/*
 		 * // Cloud cloudTexture = new
 		 * BitmapTextureAtlas(this.getTextureManager(), 2100, 2100,
@@ -580,7 +587,7 @@ zoomCamera.setResizeOnSurfaceSizeChanged(true);
 			}
 			if (sunModifier != null) {
 				if (assetSuffix.equals("night")) {
-					sun.unregisterEntityModifier(sunModifier);
+					//sun.unregisterEntityModifier(sunModifier);
 				}
 			}
 		}
